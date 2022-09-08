@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 import 'price_screen.dart';
 
 void main() async {
@@ -17,7 +18,9 @@ class MyApp extends StatelessWidget {
           appBarTheme: const AppBarTheme(color: Colors.blueGrey),
           cardColor: Colors.blueGrey,
           scaffoldBackgroundColor: Colors.white),
-      home: const PriceScreen(),
+      home: LoaderOverlay(
+        child: const PriceScreen(),
+      ),
     );
   }
 }

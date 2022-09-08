@@ -1,6 +1,7 @@
 import 'package:crypto_value/coin_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 import 'data_retriever.dart';
 import 'dart:io' show Platform;
 
@@ -33,18 +34,22 @@ class _PriceScreenState extends State<PriceScreen> {
       );
     }
     return StatefulBuilder(
-      builder: (BuildContext context, setState) => DropdownButton<String>(
-        style: TextStyle(fontSize: 20),
-        dropdownColor: Colors.blueGrey[800],
-        iconEnabledColor: Colors.white,
-        value: selectedCurrency,
-        onChanged: (value) {
-          setState(() {
-            selectedCurrency = value!;
-            defaultIndex = currenciesList.indexOf(value);
-          });
-        },
-        items: list,
+      builder: (BuildContext context, setState) => Column(
+        children: [
+          DropdownButton<String>(
+            style: TextStyle(fontSize: 20),
+            dropdownColor: Colors.blueGrey[800],
+            iconEnabledColor: Colors.white,
+            value: selectedCurrency,
+            onChanged: (value) {
+              setState(() {
+                selectedCurrency = value!;
+                defaultIndex = currenciesList.indexOf(value);
+              });
+            },
+            items: list,
+          ),
+        ],
       ),
     );
   }
@@ -79,10 +84,11 @@ class _PriceScreenState extends State<PriceScreen> {
         .getcurrencyData(crypto: 'ETH', fiat: selectedCurrency);
     var currencyDataLTC = await CurrencyConverter()
         .getcurrencyData(crypto: 'LTC', fiat: selectedCurrency);
-    fromBTC = currencyDataBTC['rate'].toStringAsFixed(2);
-    fromETH = currencyDataETH['rate'].toStringAsFixed(2);
-    fromLTC = currencyDataLTC['rate'].toStringAsFixed(2);
+    fromBTC = currencyDataBTC['rate'].toStringAsFixed(2) ?? 'NA';
+    fromETH = currencyDataETH['rate'].toStringAsFixed(2) ?? 'NA';
+    fromLTC = currencyDataLTC['rate'].toStringAsFixed(2) ?? 'NA';
     setState(() {});
+    context.loaderOverlay.hide();
   }
 
   @override
@@ -114,9 +120,9 @@ class _PriceScreenState extends State<PriceScreen> {
             // child: Platform.isAndroid ? androidDropdown() : iosPicker(),
             // child: RotatedBox(quarterTurns: 1, child: iosPicker()),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Platform.isAndroid ? androidDropdown() : iosPicker(),
+                Platform.isAndroid ? iosPicker() : androidDropdown(),
                 Padding(
                   padding: const EdgeInsets.only(top: 20),
                   child: ElevatedButton(
@@ -124,6 +130,7 @@ class _PriceScreenState extends State<PriceScreen> {
                     //     backgroundColor:
                     //         MaterialStateProperty.all(Colors.blueGrey)),
                     onPressed: () async {
+                      context.loaderOverlay.show();
                       updateUI();
                     },
                     child: const Padding(
